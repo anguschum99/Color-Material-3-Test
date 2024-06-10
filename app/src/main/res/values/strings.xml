@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">BA Style</string>
+    <string name="student_name_1">Haruka</string>
+    <string name="student_name_2">Himari</string>
+    <string name="student_name_3">Mina</string>
+    <string name="student_name_4">Toki</string>
+    <string name="student_name_5">Wakamo</string>
+    <string name="student_name_6">Kotama</string>
+    <string name="student_name_7">Hifumi</string>
+    <string name="hobby_1">Growing Weeds</string>
+    <string name="hobby_2">Fortune Telling</string>
+    <string name="hobby_3">Watching Movies</string>
+    <string name="hobby_4">TBD</string>
+    <string name="hobby_5">Destruction</string>
+    <string name="hobby_6">Wiretapping</string>
+    <string name="hobby_7">Collecting Peroro Merch</string>
+    <string name="years_old">Years Old</string>
+    <string name="yo">%1$s Years Old</string>
+</resources>
