@@ -5,11 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,15 +21,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -61,7 +75,7 @@ class MainActivity : ComponentActivity() {
 fun StudentApp() {
     Scaffold(
         topBar = {
-            topBar()
+            TopBar()
         }
     ) { it ->
         LazyColumn(contentPadding = it) {
@@ -81,16 +95,64 @@ fun StudentCard(
     student: Student,
     modifier: Modifier = Modifier
 ) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+
     Card(modifier = modifier) {
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_small))
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                )
         ) {
-            StudentIcon(studentIcon = student.imageResourceId)
-            StudentInfo(studentName = student.name, age = student.age)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.padding_small)),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                StudentIcon(studentIcon = student.imageResourceId)
+                StudentInfo(studentName = student.name, age = student.age)
+                Spacer(modifier = Modifier.weight(2f))
+                StudentItemButton(
+                    expanded = expanded,
+                    onClick = { expanded = !expanded }
+                )
+            }
+            if (expanded){
+                StudentHobby(studentHobby = student.hobby,
+                    modifier = Modifier.padding(
+                        dimensionResource(id = R.dimen.padding_medium),
+                        dimensionResource(id = R.dimen.padding_small),
+                        dimensionResource(id = R.dimen.padding_small),
+                        dimensionResource(id = R.dimen.padding_medium)
+                    )
+                )
+            }
+
         }
     }
+}
+
+@Composable
+fun StudentHobby(
+    @StringRes studentHobby:Int,
+    modifier:Modifier = Modifier
+){
+    Column(modifier=modifier) {
+        Text(
+            text = stringResource(R.string.hobbies),
+            style = MaterialTheme.typography.labelMedium
+        )
+        Text(text = stringResource(studentHobby),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+
 }
 
 
@@ -107,8 +169,7 @@ fun StudentInfo(
         Text(
             text = stringResource(id = studentName),
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(top = 20.dp)
+            style = MaterialTheme.typography.titleLarge
         )
         Text(
             text = stringResource(R.string.yo, age),
@@ -134,9 +195,33 @@ fun StudentIcon(
     )
 }
 
+@Composable
+private fun StudentItemButton(
+    expanded:Boolean,
+    onClick:() -> Unit,
+    modifier: Modifier = Modifier
+){
+    IconButton(
+        onClick = onClick,
+        modifier = modifier) {
+        Icon(
+            imageVector = if (expanded) {
+                Icons.Filled.KeyboardArrowDown
+            }
+            else
+                Icons.Filled.KeyboardArrowUp,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun topBar(modifier: Modifier = Modifier) {
+fun TopBar(modifier: Modifier = Modifier) {
     CenterAlignedTopAppBar(
         title = {
             Image(
@@ -153,6 +238,8 @@ fun topBar(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun studentPreview() {
-    StudentApp()
+fun StudentPreview() {
+    AppTheme(darkTheme = true) {
+        StudentApp()
+    }
 }
